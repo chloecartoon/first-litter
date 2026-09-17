@@ -1,5 +1,12 @@
 # First Litter
 
+### ▶︎ [Open the app](https://chloecartoon.github.io/first-litter/)
+
+No sign-up, no install, nothing to pay. It works offline once you've opened it,
+and everything you enter stays on your own device.
+
+---
+
 A calm, offline companion for taking a dog through pregnancy, whelping, and the
 puppies' first months. Built to feel like a warm illustrated journal, not a
 clinical tracker — the kind of thing you open at 2am to check what's normal.
@@ -37,6 +44,9 @@ Open the site in your phone's browser, then:
 It then works fully offline.
 
 ## Run it yourself
+
+Only needed if you want to change the code — to just *use* it, open the
+[live app](https://chloecartoon.github.io/first-litter/).
 
 No build step, no dependencies. It's one HTML file.
 
