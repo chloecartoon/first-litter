@@ -152,6 +152,10 @@
     letter-spacing: -0.01em;
   }
 
+  /* Mama's screen is mostly a post-delivery tracker; before the birth
+     only the feeding cards are relevant. */
+  body.pre-delivery .post-only { display: none; }
+
   /* ---------- TRAINING SCHOOL ---------- */
   .pup-art {
     width: 100%; height: auto; display: block;
@@ -1740,11 +1744,11 @@
       <button class="back-btn" onclick="closeSheet('sheet-more'); switchScreen('today')">‹</button>
       <div>
         <h1>{mom}'s Health</h1>
-        <div class="sub">Post-delivery recovery tracker</div>
+        <div class="sub" id="mama-sub">Post-delivery recovery tracker</div>
       </div>
     </div>
 
-    <div class="card" style="background: var(--belly-pink);">
+    <div class="card post-only" style="background: var(--belly-pink);">
       <div class="card-label">Recovery weight</div>
       <div id="snoopy-current-weight" style="font-family:var(--font-display); font-size:48px; font-weight:700; line-height:1;">— <small style="font-family:var(--font-ui); font-size:16px; font-weight:600; color:var(--muted);">kg</small></div>
       <div id="snoopy-weight-delta" style="color:var(--muted); font-size:13px; margin-top:2px;">—</div>
@@ -1775,14 +1779,14 @@
       <div id="snoopy-portion-out" style="margin-top:8px;">—</div>
     </div>
 
-    <div class="card">
+    <div class="card post-only">
       <div class="card-label">Today's check-in</div>
       <p style="font-size:13px; margin:0 0 12px;">Quick daily status — {mom} is doing all the work of feeding 5 pups.</p>
       <div id="snoopy-daily-form"></div>
       <button class="btn btn-primary btn-block" onclick="saveSnoopyDaily()" style="margin-top:10px;">Save today's check-in</button>
     </div>
 
-    <div class="card" style="background: rgba(216,106,90,0.08); border:1.5px solid rgba(216,106,90,0.35);">
+    <div class="card post-only" style="background: rgba(216,106,90,0.08); border:1.5px solid rgba(216,106,90,0.35);">
       <div class="card-label" style="color:var(--danger);">Eclampsia symptom check</div>
       <p style="font-size:13px; margin:0 0 8px;">Peak risk: <strong>weeks 2–4 post-delivery</strong>. Rapid progression, fatal if untreated. Any yes → vet immediately.</p>
       <div id="eclampsia-form"></div>
@@ -1800,7 +1804,7 @@
       <div id="nutrition-stage-warn"></div>
     </div>
 
-    <div class="card">
+    <div class="card post-only">
       <div class="card-label">Recent check-ins</div>
       <div id="snoopy-history"></div>
     </div>
@@ -2254,16 +2258,25 @@ function renderCountdown() {
 function hasPuppies() { return state.puppies.length > 0; }
 
 function tabsForStage() {
-  const mamaTab = { screen: 'snoopy', ico: '💛', label: mom() };
+  // Her health screen is a post-delivery recovery tracker, so it only
+  // earns a tab once the puppies are here. Before that it stays in More,
+  // where the feeding cards are still reachable.
   return hasPuppies()
     ? [ { screen: 'today',       ico: '🏠', label: 'Home' },
         { screen: 'puppies',     ico: '🐾', label: 'Logs' },
         { screen: 'development', ico: '🌱', label: 'Grow' },
-        mamaTab ]
+        { screen: 'snoopy',      ico: '💛', label: mom() } ]
     : [ { screen: 'today', ico: '🏠', label: 'Home' },
         { screen: 'prep',  ico: '📋', label: 'Prep' },
-        { screen: 'labor', ico: '🏥', label: 'Labor' },
-        mamaTab ];
+        { screen: 'labor', ico: '🏥', label: 'Labor' } ];
+}
+
+// Before the birth, hide the recovery-tracker cards and retitle the screen.
+function syncDeliveryPhase() {
+  const born = hasPuppies();
+  document.body.classList.toggle('pre-delivery', !born);
+  const sub = document.getElementById('mama-sub');
+  if (sub) sub.textContent = born ? 'Post-delivery recovery tracker' : 'Feeding & portions during pregnancy';
 }
 
 function renderTabBar(active) {
@@ -2292,7 +2305,9 @@ function renderMoreSheet() {
     items.push({ screen: 'labor', ico: '🏥', bg: 'var(--peach-warm)', title: 'Labor Watch · archive',
                  sub: 'Signs of labor, stage 1 (pre-delivery)' });
   } else {
-    items.push({ screen: 'puppies', ico: '🐾', bg: 'var(--mint-calm)', title: 'Puppy logs',
+    items.push({ screen: 'snoopy', ico: '💛', bg: 'var(--mint-calm)', title: `Feeding & portions`,
+                 sub: `How much ${mom()} eats now — pregnancy through nursing` });
+    items.push({ screen: 'puppies', ico: '🐾', bg: 'var(--sky-wash)', title: 'Puppy logs',
                  sub: 'Empty until the first puppy is born — log one to unlock' });
   }
   items.push({ screen: 'settings', ico: '⚙️', bg: 'var(--sky-wash)', title: 'Settings',
@@ -2322,6 +2337,7 @@ function switchScreen(name) {
 
   renderTabBar(name);
   renderMoreSheet();
+  syncDeliveryPhase();
 
   // Per-screen renders
   if (name === 'today') { renderHomeGreeting(); renderCountdown(); renderTemps(); renderToday(); renderWeightAlerts(); renderHomePeeks(); }
@@ -4186,6 +4202,7 @@ document.getElementById('p-add').addEventListener('click', () => {
   renderCountdown();
   renderTabBar();      // first puppy: Prep + Labor hand over to Logs + Grow
   renderMoreSheet();
+  syncDeliveryPhase();
 });
 
 // ============================================================
@@ -5463,6 +5480,7 @@ if ('serviceWorker' in navigator) {
 fillMomTokens();
 renderTabBar('today');
 renderMoreSheet();
+syncDeliveryPhase();
 renderHomeGreeting();
 renderCountdown();
 renderTemps();
