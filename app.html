@@ -2248,7 +2248,7 @@ function renderCountdown() {
 
 // ============================================================
 // STAGE-AWARE NAVIGATION
-// The tab bar follows the real lifecycle: Prep + Labour while she's
+// The tab bar follows the real lifecycle: Prep + Labor while she's
 // pregnant, handing over to Logs + Grow once the first puppy exists.
 // ============================================================
 function hasPuppies() { return state.puppies.length > 0; }
@@ -2262,7 +2262,7 @@ function tabsForStage() {
         mamaTab ]
     : [ { screen: 'today', ico: '🏠', label: 'Home' },
         { screen: 'prep',  ico: '📋', label: 'Prep' },
-        { screen: 'labor', ico: '🏥', label: 'Labour' },
+        { screen: 'labor', ico: '🏥', label: 'Labor' },
         mamaTab ];
 }
 
@@ -2285,12 +2285,12 @@ function renderMoreSheet() {
     { screen: 'training', ico: '🎓', bg: 'var(--lavender-soft)', title: 'Training School',
       sub: '29 cues, illustrated step by step — puppy to 6 months' }
   ];
-  // Prep and Labour live in the tab bar until the puppies arrive, then retire to here
+  // Prep and Labor live in the tab bar until the puppies arrive, then retire to here
   if (born) {
     items.push({ screen: 'prep', ico: '📋', bg: 'var(--sunny-butter)', title: 'Prep · archive',
-                 sub: 'Supplies, whelping box, mum care (pre-delivery)' });
-    items.push({ screen: 'labor', ico: '🏥', bg: 'var(--peach-warm)', title: 'Labour Watch · archive',
-                 sub: 'Signs of labour, stage 1 (pre-delivery)' });
+                 sub: 'Supplies, whelping box, mom care (pre-delivery)' });
+    items.push({ screen: 'labor', ico: '🏥', bg: 'var(--peach-warm)', title: 'Labor Watch · archive',
+                 sub: 'Signs of labor, stage 1 (pre-delivery)' });
   } else {
     items.push({ screen: 'puppies', ico: '🐾', bg: 'var(--mint-calm)', title: 'Puppy logs',
                  sub: 'Empty until the first puppy is born — log one to unlock' });
@@ -4184,7 +4184,7 @@ document.getElementById('p-add').addEventListener('click', () => {
   renderDeliveryTimer();
   renderHomeGreeting();
   renderCountdown();
-  renderTabBar();      // first puppy: Prep + Labour hand over to Logs + Grow
+  renderTabBar();      // first puppy: Prep + Labor hand over to Logs + Grow
   renderMoreSheet();
 });
 
