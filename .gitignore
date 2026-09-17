@@ -1,0 +1,24 @@
+# ── Your private records — never publish ────────────────────
+# Real puppy photos (embedded as data), weights, notes, phone
+# numbers. This is YOUR data, not part of the app.
+snoopy-backup-*.json
+reports/
+tools/rename_puppies.py
+
+# ── Not part of this app ────────────────────────────────────
+the-agi-guide-remix-scripts.md
+
+# ── Stale builds (old copies that still hold the vet number) ─
+deploy/
+
+# ── Working files ───────────────────────────────────────────
+*.bak-*
+app.html.bak*
+_*.html
+_*.js
+assets/snoopy/_debug_*
+.DS_Store
+
+# ── Local tooling ───────────────────────────────────────────
+.claude/settings.local.json
+.netlify/

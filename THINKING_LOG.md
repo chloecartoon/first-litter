@@ -1,0 +1,1 @@
+- 2026-07-15 Lane B (default) — Snoopy app: shift from text-heavy to more interactive design — engaged
