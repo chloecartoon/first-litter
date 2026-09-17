@@ -156,6 +156,16 @@
      only the feeding cards are relevant. */
   body.pre-delivery .post-only { display: none; }
 
+  .how-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 6px; padding: 5px 11px;
+    border: none; border-radius: var(--radius-button);
+    background: var(--lavender-soft); color: var(--ink);
+    font-family: var(--font-ui); font-size: 11px; font-weight: 600;
+    cursor: pointer;
+  }
+  .check-row.done .how-btn { opacity: 0.55; }
+
   /* ---------- TRAINING SCHOOL ---------- */
   .pup-art {
     width: 100%; height: auto; display: block;
@@ -1638,12 +1648,6 @@
       </div>
     </div>
 
-    <div class="card" style="background: var(--lavender-soft);">
-      <div class="card-label">Training School</div>
-      <p style="font-size:13px; margin:0 0 8px;">Every cue worth teaching from week 3 to 6 months — sit, down, stay, recall, leave it, loose leash — each one broken into illustrated steps.</p>
-      <button class="btn btn-primary btn-block" onclick="switchScreen('training')" style="margin-top:6px;">Open Training School →</button>
-    </div>
-
     <!-- Tier 1: This week's guide -->
     <div class="stage-scroller" id="dev-week-scroller"></div>
     <div class="today-strip" id="dev-today-strip"></div>
@@ -1669,8 +1673,14 @@
     <!-- Tier 3: Training curriculum (all 8 weeks, collapsible) -->
     <div class="card">
       <div class="card-label">Full training curriculum</div>
-      <p style="font-size:13px; margin:0 0 8px;">Tick items as done for the whole litter. Auto-expands current week.</p>
+      <p style="font-size:13px; margin:0 0 8px;">Tick items as done for the whole litter. Auto-expands current week. Anything with <strong>How to teach it</strong> opens the step-by-step guide.</p>
       <div id="dev-training-list"></div>
+    </div>
+
+    <div class="card" style="background: var(--lavender-soft);">
+      <div class="card-label">Training School</div>
+      <p style="font-size:13px; margin:0 0 8px;">The same tutorials, browsable on their own — all 29 cues from week 3 to six months, each in illustrated steps.</p>
+      <button class="btn btn-primary btn-block" onclick="switchScreen('training')" style="margin-top:6px;">Browse all 29 cues →</button>
     </div>
 
     <!-- Puppy nutrition: portion calculator -->
@@ -2294,10 +2304,7 @@ function renderMoreSheet() {
   const list = document.getElementById('more-list');
   if (!list) return;
   const born = hasPuppies();
-  const items = [
-    { screen: 'training', ico: '🎓', bg: 'var(--lavender-soft)', title: 'Training School',
-      sub: '29 cues, illustrated step by step — puppy to 6 months' }
-  ];
+  const items = [];
   // Prep and Labor live in the tab bar until the puppies arrive, then retire to here
   if (born) {
     items.push({ screen: 'prep', ico: '📋', bg: 'var(--sunny-butter)', title: 'Prep · archive',
@@ -2874,64 +2881,64 @@ const MILESTONES = [
 const TRAINING_CURRICULUM = [
   { week: 3, key: 'training-w3', title: 'Introduction week', range: 'day 15–21',
     items: [
-      ['t3-1', 'Handle all body parts daily', 'Paws, ears, tail, mouth briefly open. 1 min each.'],
-      ['t3-2', 'Soft sound exposure', 'Radio low, no sudden sounds yet.'],
-      ['t3-3', 'Introduce puppy pads / newspaper', 'Place near sleeping area.'],
-      ['t3-4', 'Novel textures under paws', 'Towel, tile, soft mat.']
+      ['t3-1', 'Handle all body parts daily', 'Paws, ears, tail, mouth briefly open. 1 min each.', 'handling'],
+      ['t3-2', 'Soft sound exposure', 'Radio low, no sudden sounds yet.', 'confidence'],
+      ['t3-3', 'Introduce puppy pads / newspaper', 'Place near sleeping area.', 'toilet-start'],
+      ['t3-4', 'Novel textures under paws', 'Towel, tile, soft mat.', 'confidence']
     ]},
   { week: 4, key: 'training-w4', title: 'Play + socialize', range: 'day 22–28',
     items: [
-      ['t4-1', 'Introduce soft toys', 'Squeaky rope, small plush. Redirect biting to toys.'],
-      ['t4-2', 'Let them play-wrestle each other', 'They learn bite inhibition from yelps.'],
-      ['t4-3', 'Crate/carrier intro', 'Treats inside, door open. Never a punishment.'],
-      ['t4-4', 'Household sound exposure', 'Soft doorbell, TV at low volume.']
+      ['t4-1', 'Introduce soft toys', 'Squeaky rope, small plush. Redirect biting to toys.', 'bite'],
+      ['t4-2', 'Let them play-wrestle each other', 'They learn bite inhibition from yelps.', 'bite'],
+      ['t4-3', 'Crate/carrier intro', 'Treats inside, door open. Never a punishment.', 'crate'],
+      ['t4-4', 'Household sound exposure', 'Soft doorbell, TV at low volume.', 'confidence']
     ]},
   { week: 5, key: 'training-w5', title: 'First cues', range: 'day 29–35',
     items: [
-      ['t5-1', 'Introduce name', 'Say name → treat. 5 reps, 2× day. No consequence for ignoring.'],
-      ['t5-2', 'Sit — food lure', 'Treat above nose → back → sits → mark + reward.'],
-      ['t5-3', 'Meet a calm vaccinated adult dog', 'Friend\'s dog. Supervised, brief.'],
-      ['t5-4', 'First short car ride', '5 min, one puppy at a time in carrier.']
+      ['t5-1', 'Introduce name', 'Say name → treat. 5 reps, 2× day. No consequence for ignoring.', 'name'],
+      ['t5-2', 'Sit — food lure', 'Treat above nose → back → sits → mark + reward.', 'sit'],
+      ['t5-3', 'Meet a calm vaccinated adult dog', 'Friend\'s dog. Supervised, brief.', 'social'],
+      ['t5-4', 'First short car ride', '5 min, one puppy at a time in carrier.', 'vet']
     ]},
   { week: 6, key: 'training-w6', title: 'Manners + people', range: 'day 36–42',
     items: [
-      ['t6-1', 'Sit on cue (name + hand signal)', 'Fade the lure.'],
-      ['t6-2', 'Come at 1 meter', 'Kneel + kissy sound → treat when they arrive.'],
-      ['t6-3', 'Meet 3+ new humans', 'Varied ages, hats, glasses. No forced interaction.'],
-      ['t6-4', 'Brushing intro', '30 sec + treat. Build up to full brush.'],
-      ['t6-5', 'Alone-time practice', '5 min alone in a safe space. Build gradually.']
+      ['t6-1', 'Sit on cue (name + hand signal)', 'Fade the lure.', 'sit'],
+      ['t6-2', 'Come at 1 meter', 'Kneel + kissy sound → treat when they arrive.', 'recall'],
+      ['t6-3', 'Meet 3+ new humans', 'Varied ages, hats, glasses. No forced interaction.', 'social'],
+      ['t6-4', 'Brushing intro', '30 sec + treat. Build up to full brush.', 'grooming'],
+      ['t6-5', 'Alone-time practice', '5 min alone in a safe space. Build gradually.', 'alone']
     ]},
   { week: 7, key: 'training-w7', title: 'Life skills', range: 'day 43–49',
     items: [
-      ['t7-1', 'No jumping on humans', 'Turn away when they jump. Attention only when 4 paws down.'],
-      ['t7-2', '"Leave it" intro', 'Cover treat with hand → wait for turn-away → mark + reward.'],
-      ['t7-3', 'Loose leash intro', 'Just wearing collar/harness indoors.'],
-      ['t7-4', 'Novel object daily', 'Umbrella, box, plastic bag, bicycle helmet. Investigate freely.'],
-      ['t7-5', 'Alone-time 10 min', 'Extend gradually. Return before they panic.']
+      ['t7-1', 'No jumping on humans', 'Turn away when they jump. Attention only when 4 paws down.', 'jumping'],
+      ['t7-2', '"Leave it" intro', 'Cover treat with hand → wait for turn-away → mark + reward.', 'leave-it'],
+      ['t7-3', 'Loose leash intro', 'Just wearing collar/harness indoors.', 'leash-intro'],
+      ['t7-4', 'Novel object daily', 'Umbrella, box, plastic bag, bicycle helmet. Investigate freely.', 'confidence'],
+      ['t7-5', 'Alone-time 10 min', 'Extend gradually. Return before they panic.', 'alone']
     ]},
   { week: 8, key: 'training-w8', title: 'Home stretch', range: 'day 50–56',
     items: [
-      ['t8-1', 'Recall from 3 meters', 'Add mild distraction (another person in room).'],
-      ['t8-2', '"Wait" 2 sec before food bowl', 'Hand on bowl → they wait → release word → eat.'],
-      ['t8-3', 'Loose-leash walking outside', 'Once vaccinated. Very short walks.'],
-      ['t8-4', 'Alone-time 15 min', 'Should be calm when alone.'],
-      ['t8-5', 'Meet 2+ more new humans', 'Keep the socialization pace up.']
+      ['t8-1', 'Recall from 3 meters', 'Add mild distraction (another person in room).', 'recall'],
+      ['t8-2', '"Wait" 2 sec before food bowl', 'Hand on bowl → they wait → release word → eat.', 'wait'],
+      ['t8-3', 'Loose-leash walking outside', 'Once vaccinated. Very short walks.', 'loose-leash'],
+      ['t8-4', 'Alone-time 15 min', 'Should be calm when alone.', 'alone'],
+      ['t8-5', 'Meet 2+ more new humans', 'Keep the socialization pace up.', 'social']
     ]},
   { week: 9, key: 'training-w9', title: 'Confidence + polish', range: 'day 57–63',
     items: [
-      ['t9-1', 'Recall with 2-person distraction', 'Both people call, only ONE rewards when they arrive.'],
-      ['t9-2', '"Sit" + "wait" chained', 'Sit → wait 2 sec → release → treat.'],
-      ['t9-3', 'Alone-time 20–30 min', 'In a safe space, treat-stuffed toy.'],
-      ['t9-4', 'Grooming table intro', 'Just standing on it + treats. Prep for future groomer visits.'],
-      ['t9-5', 'Meet 2+ humans + 1 new dog', 'Calm, vaccinated dog. Supervised.']
+      ['t9-1', 'Recall with 2-person distraction', 'Both people call, only ONE rewards when they arrive.', 'recall-proof'],
+      ['t9-2', '"Sit" + "wait" chained', 'Sit → wait 2 sec → release → treat.', 'stay'],
+      ['t9-3', 'Alone-time 20–30 min', 'In a safe space, treat-stuffed toy.', 'alone'],
+      ['t9-4', 'Grooming table intro', 'Just standing on it + treats. Prep for future groomer visits.', 'grooming'],
+      ['t9-5', 'Meet 2+ humans + 1 new dog', 'Calm, vaccinated dog. Supervised.', 'social']
     ]},
   { week: 10, key: 'training-w10', title: 'Rehoming ready', range: 'day 64–70',
     items: [
-      ['t10-1', 'Recall from 5 meters + distraction', 'Real-world distance.'],
-      ['t10-2', '"Leave it" reliable', 'Treat on the floor → they turn away → reward with a different treat.'],
-      ['t10-3', 'Loose-leash walking outside', 'Post-2nd vaccine, 5-min walks.'],
-      ['t10-4', 'Final grooming session', 'Brush, paws, ears, teeth check. Rehearsal for new owner.'],
-      ['t10-6', 'Final vet check + clean-bill letter', 'For new owners — proves health at handoff.'],
+      ['t10-1', 'Recall from 5 meters + distraction', 'Real-world distance.', 'recall-proof'],
+      ['t10-2', '"Leave it" reliable', 'Treat on the floor → they turn away → reward with a different treat.', 'leave-it'],
+      ['t10-3', 'Loose-leash walking outside', 'Post-2nd vaccine, 5-min walks.', 'loose-leash'],
+      ['t10-4', 'Final grooming session', 'Brush, paws, ears, teeth check. Rehearsal for new owner.', 'grooming'],
+      ['t10-6', 'Final vet check + clean-bill letter', 'For new owners — proves health at handoff.', 'vet'],
       ['n1', 'New owner pack: vet record', 'Vaccinations, dewormings, microchip number.'],
       ['n2', 'New owner pack: 3 days of current food', 'Ease transition.'],
       ['n3', `New owner pack: blanket smelling like ${mom()} + littermates`, 'Eases first nights.'],
@@ -3441,17 +3448,22 @@ function renderChecklist(key, mountEl) {
   if (!cfg || !mountEl) return;
   state.checks[key] ??= {};
   mountEl.innerHTML = '';
-  cfg.items.forEach(([id, title, why]) => {
+  cfg.items.forEach(([id, title, why, cueId]) => {
     const done = !!state.checks[key][id];
     const row = document.createElement('div');
     row.className = 'check-row' + (done ? ' done' : '');
+    // Weekly curriculum items that have a step-by-step tutorial link straight to it
+    const cue = cueId && typeof trainCue === 'function' ? trainCue(cueId) : null;
     row.innerHTML = `
       <button class="check ${done?'done':''}" aria-label="toggle"></button>
       <div class="label">
         <strong>${title}</strong>
         ${why ? `<span class="why">${why}</span>` : ''}
+        ${cue ? `<button class="how-btn" data-cue="${cueId}">${cue.icon} How to teach it →</button>` : ''}
       </div>
     `;
+    const how = row.querySelector('.how-btn');
+    if (how) how.addEventListener('click', e => { e.stopPropagation(); openCue(how.dataset.cue); });
     row.addEventListener('click', () => {
       const cur = !!state.checks[key][id];
       state.checks[key][id] = !cur;
