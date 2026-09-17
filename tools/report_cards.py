@@ -667,20 +667,32 @@ body{
 """
 
 
-CAVEAT_TTF = "/Users/chloe/Chloe-Workspace/design/fonts/Caveat-Bold.ttf"
+# Where to find Caveat-Bold.ttf. Set CAVEAT_TTF in the environment to point
+# somewhere else; otherwise these are tried in order. If none exist the card
+# still renders, just with a fallback face.
+CAVEAT_TTF_CANDIDATES = [
+    os.environ.get("CAVEAT_TTF"),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "fonts", "Caveat-Bold.ttf"),
+    os.path.expanduser("~/Library/Fonts/Caveat-Bold.ttf"),
+    "/Library/Fonts/Caveat-Bold.ttf",
+    os.path.expanduser("~/.local/share/fonts/Caveat-Bold.ttf"),
+]
 
 
 def font_face_css():
     """Embed Caveat, the display face the brand system specifies for puppy names.
     It isn't installed system-wide, so without this the name silently falls back
     to Bradley Hand. Embedded (not linked) so a card stays correct when it's
-    emailed to a new owner. Poppins is left to the system copy — it's installed
-    here, so Chrome embeds it into the PDF anyway."""
+    emailed to a new owner. Poppins is left to the system copy — where it's
+    installed, Chrome embeds it into the PDF anyway."""
+    path = next((p for p in CAVEAT_TTF_CANDIDATES if p and os.path.exists(p)), None)
+    if not path:
+        return ""  # falls back to the rest of the stack
     try:
-        with open(CAVEAT_TTF, "rb") as f:
+        with open(path, "rb") as f:
             b64 = base64.b64encode(f.read()).decode("ascii")
     except OSError:
-        return ""  # falls back to the rest of the stack
+        return ""
     return (
         "@font-face{font-family:'Caveat';font-style:normal;font-weight:700;"
         f"src:url(data:font/ttf;base64,{b64}) format('truetype');font-display:block}}"
