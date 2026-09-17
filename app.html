@@ -1863,23 +1863,7 @@
   </main>
 
   <!-- ===================== BOTTOM TAB BAR ===================== -->
-  <nav class="tab-bar">
-    <button class="tab active" data-screen="today" onclick="switchScreen('today')">
-      <span class="ico">🏠</span>Home
-    </button>
-    <button class="tab" data-screen="puppies" onclick="switchScreen('puppies')">
-      <span class="ico">🐾</span>Logs
-    </button>
-    <button class="tab" data-screen="development" onclick="switchScreen('development')">
-      <span class="ico">🌱</span>Grow
-    </button>
-    <button class="tab" data-screen="snoopy" onclick="switchScreen('snoopy')">
-      <span class="ico">💛</span>{mom}
-    </button>
-    <button class="tab" onclick="openSheet('sheet-more')">
-      <span class="ico">⋯</span>More
-    </button>
-  </nav>
+  <nav class="tab-bar" id="tab-bar"></nav>
 
   <!-- SOS floating button -->
   <button class="sos-btn" onclick="openSheet('sheet-sos')" aria-label="Emergency">SOS</button>
@@ -1889,47 +1873,8 @@
     <div class="sheet-content">
       <div class="sheet-handle"></div>
       <h3>More</h3>
-      <div class="lbl">Reference, archives, settings</div>
-      <button class="category-card" onclick="closeSheet('sheet-more'); switchScreen('training');">
-        <div class="ico" style="background: var(--lavender-soft);">🎓</div>
-        <div class="info">
-          <strong>Training School</strong>
-          <span>29 cues, illustrated step by step — puppy to 6 months</span>
-        </div>
-        <div class="arrow">›</div>
-      </button>
-      <button class="category-card" onclick="closeSheet('sheet-more'); switchScreen('prep');">
-        <div class="ico" style="background: var(--sunny-butter);">📋</div>
-        <div class="info">
-          <strong>Prep · archive</strong>
-          <span>Supplies, whelping box, mom care (pre-delivery)</span>
-        </div>
-        <div class="arrow">›</div>
-      </button>
-      <button class="category-card" onclick="closeSheet('sheet-more'); switchScreen('labor');">
-        <div class="ico" style="background: var(--peach-warm);">🏥</div>
-        <div class="info">
-          <strong>Labor Watch · archive</strong>
-          <span>Signs of labor, stage 1 (pre-delivery)</span>
-        </div>
-        <div class="arrow">›</div>
-      </button>
-      <button class="category-card" onclick="closeSheet('sheet-more'); switchScreen('settings');">
-        <div class="ico" style="background: var(--sky-wash);">⚙️</div>
-        <div class="info">
-          <strong>Settings</strong>
-          <span>Due date, vet info, backup &amp; restore</span>
-        </div>
-        <div class="arrow">›</div>
-      </button>
-      <button class="category-card" onclick="closeSheet('sheet-more'); openSheet('sheet-sos');">
-        <div class="ico" style="background: var(--belly-pink);">📞</div>
-        <div class="info">
-          <strong>Emergency contacts</strong>
-          <span>One-tap vet calls</span>
-        </div>
-        <div class="arrow">›</div>
-      </button>
+      <div class="lbl" id="more-lbl">Reference, settings</div>
+      <div id="more-list"></div>
     </div>
   </div>
 
@@ -2302,6 +2247,72 @@ function renderCountdown() {
 }
 
 // ============================================================
+// STAGE-AWARE NAVIGATION
+// The tab bar follows the real lifecycle: Prep + Labour while she's
+// pregnant, handing over to Logs + Grow once the first puppy exists.
+// ============================================================
+function hasPuppies() { return state.puppies.length > 0; }
+
+function tabsForStage() {
+  const mamaTab = { screen: 'snoopy', ico: '💛', label: mom() };
+  return hasPuppies()
+    ? [ { screen: 'today',       ico: '🏠', label: 'Home' },
+        { screen: 'puppies',     ico: '🐾', label: 'Logs' },
+        { screen: 'development', ico: '🌱', label: 'Grow' },
+        mamaTab ]
+    : [ { screen: 'today', ico: '🏠', label: 'Home' },
+        { screen: 'prep',  ico: '📋', label: 'Prep' },
+        { screen: 'labor', ico: '🏥', label: 'Labour' },
+        mamaTab ];
+}
+
+function renderTabBar(active) {
+  const bar = document.getElementById('tab-bar');
+  if (!bar) return;
+  const current = active || document.querySelector('.screen.active')?.id.replace('screen-', '') || 'today';
+  bar.innerHTML = tabsForStage().map(t =>
+    `<button class="tab ${t.screen === current ? 'active' : ''}" data-screen="${t.screen}" onclick="switchScreen('${t.screen}')">
+      <span class="ico">${t.ico}</span>${t.label}
+    </button>`).join('')
+    + `<button class="tab" onclick="openSheet('sheet-more')"><span class="ico">⋯</span>More</button>`;
+}
+
+function renderMoreSheet() {
+  const list = document.getElementById('more-list');
+  if (!list) return;
+  const born = hasPuppies();
+  const items = [
+    { screen: 'training', ico: '🎓', bg: 'var(--lavender-soft)', title: 'Training School',
+      sub: '29 cues, illustrated step by step — puppy to 6 months' }
+  ];
+  // Prep and Labour live in the tab bar until the puppies arrive, then retire to here
+  if (born) {
+    items.push({ screen: 'prep', ico: '📋', bg: 'var(--sunny-butter)', title: 'Prep · archive',
+                 sub: 'Supplies, whelping box, mum care (pre-delivery)' });
+    items.push({ screen: 'labor', ico: '🏥', bg: 'var(--peach-warm)', title: 'Labour Watch · archive',
+                 sub: 'Signs of labour, stage 1 (pre-delivery)' });
+  } else {
+    items.push({ screen: 'puppies', ico: '🐾', bg: 'var(--mint-calm)', title: 'Puppy logs',
+                 sub: 'Empty until the first puppy is born — log one to unlock' });
+  }
+  items.push({ screen: 'settings', ico: '⚙️', bg: 'var(--sky-wash)', title: 'Settings',
+               sub: 'Her name, due date, vet info, backup & restore' });
+
+  document.getElementById('more-lbl').textContent = born ? 'Reference, archives, settings' : 'Reference, settings';
+  list.innerHTML = items.map(i => `
+      <button class="category-card" onclick="closeSheet('sheet-more'); switchScreen('${i.screen}');">
+        <div class="ico" style="background: ${i.bg};">${i.ico}</div>
+        <div class="info"><strong>${i.title}</strong><span>${i.sub}</span></div>
+        <div class="arrow">›</div>
+      </button>`).join('')
+    + `<button class="category-card" onclick="closeSheet('sheet-more'); openSheet('sheet-sos');">
+        <div class="ico" style="background: var(--belly-pink);">📞</div>
+        <div class="info"><strong>Emergency contacts</strong><span>One-tap vet calls</span></div>
+        <div class="arrow">›</div>
+      </button>`;
+}
+
+// ============================================================
 // SCREEN SWITCHING
 // ============================================================
 function switchScreen(name) {
@@ -2309,9 +2320,8 @@ function switchScreen(name) {
   const target = document.getElementById('screen-' + name);
   if (target) target.classList.add('active');
 
-  document.querySelectorAll('.tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.screen === name);
-  });
+  renderTabBar(name);
+  renderMoreSheet();
 
   // Per-screen renders
   if (name === 'today') { renderHomeGreeting(); renderCountdown(); renderTemps(); renderToday(); renderWeightAlerts(); renderHomePeeks(); }
@@ -4079,7 +4089,7 @@ function deleteEditPuppy() {
   state.puppies = state.puppies.filter(x => x.id !== activePuppyId);
   save();
   closeSheet('sheet-edit-puppy');
-  switchScreen('puppies');
+  switchScreen(state.puppies.length ? 'puppies' : 'today');
   renderCountdown();
   showToast('Puppy removed');
 }
@@ -4174,6 +4184,8 @@ document.getElementById('p-add').addEventListener('click', () => {
   renderDeliveryTimer();
   renderHomeGreeting();
   renderCountdown();
+  renderTabBar();      // first puppy: Prep + Labour hand over to Logs + Grow
+  renderMoreSheet();
 });
 
 // ============================================================
@@ -5449,6 +5461,8 @@ if ('serviceWorker' in navigator) {
 // BOOT
 // ============================================================
 fillMomTokens();
+renderTabBar('today');
+renderMoreSheet();
 renderHomeGreeting();
 renderCountdown();
 renderTemps();
