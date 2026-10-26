@@ -879,6 +879,51 @@
   .puppy-log .info { flex: 1; font-size: 12px; }
   .puppy-log .info strong { display: block; font-size: 13px; }
   .puppy-log .info span { color: var(--muted); }
+  .puppy-edit-shortcut {
+    min-width: 64px;
+    min-height: 44px;
+    margin-left: auto;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--divider);
+    background: var(--surface);
+    color: var(--ink);
+    font: 600 12px var(--font-ui);
+    cursor: pointer;
+  }
+  .weight-log-note { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .weight-log-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--divider);
+    font-size: 13px;
+  }
+  .weight-log-more { margin-top: 8px; }
+  .weight-log-more > summary {
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--divider);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .weight-log-more > summary::-webkit-details-marker { display: none; }
+  .weight-log-more > summary::after { content: '+'; font-size: 18px; line-height: 1; }
+  .weight-log-more[open] > summary::after { content: '−'; }
+  .weight-log-more .open-copy { display: none; }
+  .weight-log-more[open] .closed-copy { display: none; }
+  .weight-log-more[open] .open-copy { display: inline; }
 
   /* Collar picker */
   .collar-picker {
@@ -1990,6 +2035,7 @@
         <h1 id="pup-detail-name">—</h1>
         <div class="sub" id="pup-detail-meta">—</div>
       </div>
+      <button class="puppy-edit-shortcut" type="button" onclick="openEditPuppy()" aria-label="Edit puppy details">Edit</button>
     </div>
     <div class="pup-hero" id="pup-hero">
       <div class="weight" id="pup-weight">—</div>
@@ -4974,20 +5020,34 @@ function renderWeightLog(p) {
   wrap.innerHTML = '';
   if (!p.weights.length) return;
   const label = document.createElement('div');
-  label.style.cssText = 'font-size:11px; color:var(--muted); margin-bottom:4px;';
-  label.textContent = 'Tap an entry to fix a wrong date or weight.';
+  label.className = 'weight-log-note';
+  label.textContent = 'Latest weigh-ins. Tap edit to fix a wrong date or weight.';
   wrap.appendChild(label);
-  [...p.weights].sort((a, b) => b.date.localeCompare(a.date)).forEach(w => {
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed var(--divider); font-size:13px;';
-    row.innerHTML = `
-      <span style="flex:1;">${fmtShort(parseDate(w.date))}</span>
-      <span style="font-variant-numeric:tabular-nums; font-weight:600;">${w.g}g</span>
-      <button class="btn-ghost" style="padding:4px 8px; font-size:12px;">✎</button>
-    `;
-    row.querySelector('button').addEventListener('click', () => openWeightEditRow(p, w, row));
-    wrap.appendChild(row);
-  });
+  const weights = [...p.weights].sort((a, b) => b.date.localeCompare(a.date));
+  const latest = weights.slice(0, 3);
+  const older = weights.slice(3);
+  latest.forEach(w => wrap.appendChild(createWeightLogRow(p, w)));
+  if (!older.length) return;
+
+  const details = document.createElement('details');
+  details.className = 'weight-log-more';
+  details.innerHTML = `<summary><span class="closed-copy">Show ${older.length} older weigh-ins</span><span class="open-copy">Hide older weigh-ins</span></summary>`;
+  const olderRows = document.createElement('div');
+  older.forEach(w => olderRows.appendChild(createWeightLogRow(p, w)));
+  details.appendChild(olderRows);
+  wrap.appendChild(details);
+}
+
+function createWeightLogRow(p, w) {
+  const row = document.createElement('div');
+  row.className = 'weight-log-row';
+  row.innerHTML = `
+    <span style="flex:1;">${fmtShort(parseDate(w.date))}</span>
+    <span style="font-variant-numeric:tabular-nums; font-weight:600;">${w.g}g</span>
+    <button class="btn-ghost" type="button" style="min-width:44px; min-height:44px; padding:4px 8px; font-size:12px;" aria-label="Edit ${fmtShort(parseDate(w.date))} weight">✎</button>
+  `;
+  row.querySelector('button').addEventListener('click', () => openWeightEditRow(p, w, row));
+  return row;
 }
 
 function openWeightEditRow(p, w, row) {
