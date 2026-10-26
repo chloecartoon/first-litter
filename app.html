@@ -924,6 +924,34 @@
   .weight-log-more .open-copy { display: none; }
   .weight-log-more[open] .closed-copy { display: none; }
   .weight-log-more[open] .open-copy { display: inline; }
+  .pup-section-disclosure > summary {
+    min-height: 48px;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .pup-section-disclosure > summary::-webkit-details-marker { display: none; }
+  .pup-section-disclosure > summary::after {
+    content: '+';
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .pup-section-disclosure[open] > summary::after { content: '−'; }
+  .pup-section-disclosure .disclosure-title { display: block; font-size: 14px; font-weight: 700; }
+  .pup-section-disclosure .disclosure-status { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 600; }
+  .pup-section-disclosure .disclosure-body { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(61,45,36,0.10); }
 
   /* Collar picker */
   .collar-picker {
@@ -2060,11 +2088,15 @@
       <div style="font-size:11px; color:var(--muted); margin-top:10px; line-height:1.4;">Vaccine and parasite dates must follow your veterinarian's plan. References: <a href="https://wsava.org/wp-content/uploads/2024/04/WSAVA-Vaccination-guidelines-2024.pdf" target="_blank" rel="noopener">WSAVA 2024</a> and <a href="https://capcvet.org/guidelines/general-guidelines/" target="_blank" rel="noopener">CAPC</a>.</div>
     </div>
 
-    <div class="card" style="background: var(--sky-wash);">
-      <div class="card-label">Development milestones</div>
-      <p style="font-size:12px; color:var(--muted); margin:0 0 8px;">Tap to log the date it happened. Great for the new-owner packet.</p>
-      <div id="pup-milestones"></div>
-    </div>
+    <details class="card pup-section-disclosure" id="pup-milestone-disclosure" style="background: var(--sky-wash);">
+      <summary>
+        <span><span class="disclosure-title">Development milestones</span><span class="disclosure-status" id="pup-milestone-progress">0 logged</span></span>
+      </summary>
+      <div class="disclosure-body">
+        <p style="font-size:12px; color:var(--muted); margin:0 0 8px;">Tap to log the date it happened. Great for the new-owner packet.</p>
+        <div id="pup-milestones"></div>
+      </div>
+    </details>
 
     <div class="card">
       <div class="card-label">Photos</div>
@@ -3864,6 +3896,9 @@ function renderPuppyMilestones(p) {
   const wrap = document.getElementById('pup-milestones');
   if (!wrap) return;
   p.milestones ??= {};
+  const loggedCount = MILESTONES.filter(m => p.milestones[m.id]).length;
+  const progress = document.getElementById('pup-milestone-progress');
+  if (progress) progress.textContent = `${loggedCount} of ${MILESTONES.length} logged`;
   wrap.innerHTML = '';
   MILESTONES.forEach(m => {
     const logged = p.milestones[m.id];
@@ -4963,6 +4998,8 @@ function renderPuppies() {
 
 function openPuppyDetail(id) {
   activePuppyId = id;
+  const milestoneDisclosure = document.getElementById('pup-milestone-disclosure');
+  if (milestoneDisclosure) milestoneDisclosure.open = false;
   renderPuppyDetail();
   switchScreen('puppy-detail');
 }
