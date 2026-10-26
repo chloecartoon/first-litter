@@ -1,6 +1,7 @@
 {
   "name": "First Litter — pregnancy & puppy companion",
   "short_name": "First Litter",
+  "id": "app.html",
   "description": "Track a dog through pregnancy, whelping, and the puppies’ first months.",
   "start_url": "app.html",
   "scope": ".",

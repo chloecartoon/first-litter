@@ -1,10 +1,16 @@
 // Snoopy app service worker — offline cache
 // Bump version whenever HTML changes to force re-install + cache purge
-const CACHE_NAME = 'first-litter-v4';
+const CACHE_NAME = 'first-litter-v12';
 const CORE_ASSETS = [
   './',
   'index.html',
+  'app.html',
   'manifest.json',
+  'js/state.js',
+  'js/care-plan.js',
+  'js/tasks.js',
+  'js/backups.js',
+  'js/notifications.js',
   'assets/snoopy/snoopy-happy-cut.png',
   'assets/snoopy/snoopy-curious-cut.png',
   'assets/snoopy/snoopy-sleepy-cut.png',
@@ -68,4 +74,36 @@ self.addEventListener('fetch', e => {
       }).catch(() => cached)
     )
   );
+});
+
+self.addEventListener('push', event => {
+  let count = 1;
+  try {
+    const data = event.data ? event.data.json() : {};
+    count = Math.max(1, Number(data.count) || 1);
+  } catch (_) { /* use the privacy-safe default */ }
+  const body = count === 1
+    ? '1 important care task needs your attention today.'
+    : `${count} important care tasks need your attention today.`;
+  event.waitUntil(self.registration.showNotification('First Litter', {
+    body,
+    tag: 'first-litter-important-care',
+    icon: 'icon-192.png',
+    badge: 'icon-192.png',
+    data: { url: 'app.html?open=today' }
+  }));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const openClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of openClients) {
+      if ('focus' in client) {
+        client.postMessage({ type: 'OPEN_TODAY' });
+        return client.focus();
+      }
+    }
+    return self.clients.openWindow('app.html?open=today');
+  })());
 });
