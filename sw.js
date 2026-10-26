@@ -1,6 +1,6 @@
 // Snoopy app service worker — offline cache
 // Bump version whenever HTML changes to force re-install + cache purge
-const CACHE_NAME = 'first-litter-v12';
+const CACHE_NAME = 'first-litter-v13';
 const CORE_ASSETS = [
   './',
   'index.html',
