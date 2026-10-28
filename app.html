@@ -371,12 +371,6 @@
   }
   .home-greet .text { flex:1; min-width:0; font-size: 13px; color: var(--muted); }
   .home-greet .text strong { display: block; font-size: 18px; color: var(--ink); letter-spacing:-0.01em; }
-  .home-sos {
-    width:44px; height:44px; flex:0 0 44px; border-radius:15px;
-    border:1px solid rgba(194,75,56,.28); background:rgba(194,75,56,.09); color:var(--danger);
-    font:800 10px var(--font-ui); letter-spacing:.05em; cursor:pointer;
-  }
-
   .countdown-card {
     border-radius: var(--radius-card);
     padding: 16px;
@@ -1372,27 +1366,21 @@
   /* SOS floating button */
   .sos-btn {
     position: absolute;
-    right: 20px;
+    right: 14px;
     bottom: calc(env(safe-area-inset-bottom, 0) + 104px);
-    min-width: 44px; height: 44px;
-    border-radius: 999px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
     background: var(--alert);
     color: white;
     border: none;
     font-weight: 800;
-    font-size: 11px;
+    font-size: 13px;
     box-shadow: 0 4px 16px rgba(216,106,90,0.4);
     cursor: pointer;
     z-index: 40;
-    letter-spacing: 0.05em;
-    padding:0 12px;
+    letter-spacing: 0.06em;
   }
-  .sos-btn.hidden-on-today { display:none; }
   body:has(#screen-delivery.active) #global-sos { display:none; }
-  .sos-btn.inline-sos {
-    position:static; right:auto; bottom:auto; flex:0 0 44px; min-width:44px; width:44px;
-    box-shadow:none; padding:0; margin-left:0;
-  }
 
   /* Numbered playbook lists */
   .steps-list {
@@ -1702,7 +1690,6 @@
         <strong id="home-title">Day — with {mom} 💛</strong>
         <span id="home-subtitle">—</span>
       </div>
-      <button class="home-sos" type="button" onclick="openSheet('sheet-sos')" aria-label="Emergency contacts">SOS</button>
     </div>
 
     <div id="state-load-notice"></div>
@@ -3081,17 +3068,6 @@ function renderTabBar(active) {
   const bar = document.getElementById('tab-bar');
   if (!bar) return;
   const current = active || document.querySelector('.screen.active')?.id.replace('screen-', '') || 'today';
-  const globalSos = document.getElementById('global-sos');
-  const currentHeader = document.querySelector(`#screen-${current} .screen-header`);
-  const hideGlobalSos = current === 'today' || current === 'delivery';
-  globalSos?.classList.toggle('hidden-on-today', hideGlobalSos);
-  if (globalSos && !hideGlobalSos && currentHeader) {
-    currentHeader.appendChild(globalSos);
-    globalSos.classList.add('inline-sos');
-  } else if (globalSos && !hideGlobalSos) {
-    document.querySelector('.phone-frame')?.appendChild(globalSos);
-    globalSos.classList.remove('inline-sos');
-  }
   bar.innerHTML = tabsForStage().map(t =>
     `<button class="tab ${t.screen === current ? 'active' : ''}" data-screen="${t.screen}" onclick="switchScreen('${t.screen}')">
       <span class="ico">${iconSvg(t.icon)}</span>${t.label}
